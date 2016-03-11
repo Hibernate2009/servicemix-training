@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource"
+		filter="(datasource.name=oracle)" />
+
+	<bean id="jdbcTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="PROPAGATION_REQUIRED_JDBC" class="org.apache.camel.spring.spi.SpringTransactionPolicy">
+		<property name="transactionManager" ref="jdbcTransactionManager" />
+	</bean>
+
+	<bean id="PROPAGATION_REQUIRES_NEW_JDBC" class="org.apache.camel.spring.spi.SpringTransactionPolicy">
+		<property name="transactionManager" ref="jdbcTransactionManager" />
+		<property name="propagationBehaviorName" value="PROPAGATION_REQUIRES_NEW" />
+	</bean>
+
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="dataSource" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="localService" class="com.bssys.training.chapter6.LocalService">
+		<constructor-arg>
+			<ref bean="jdbcTemplate" />
+		</constructor-arg>
+	</bean>
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="file:C:/data/chapter6/in" />
+			<transacted ref="PROPAGATION_REQUIRED_JDBC" />
+			<doTry>
+				<bean ref="localService" method="credit" />
+				<bean ref="localService" method="debit" />
+				<to uri="file:C:/data/chapter6/out"/>
+				<doCatch>
+					<exception>java.lang.IllegalStateException</exception>
+					<handled>
+						<constant>true</constant>
+					</handled>
+					<to uri="file:C:/data/chapter6/error"/>
+					<rollback markRollbackOnly="true"/>
+				</doCatch>
+			</doTry>
+
+		</route>
+	</camelContext>
+
+</beans>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
+
+	<bean id="oracleDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="oracle.jdbc.driver.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@10.1.0.137:1521:OT7ORA" />
+		<property name="username" value="TAYSS_JPM_250913" />
+		<property name="password" value="TAYSS_JPM_250913" />
+		<property name="defaultAutoCommit" value="true" />
+		<property name="testWhileIdle" value="false" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="timeBetweenEvictionRunsMillis" value="5000" />
+		<property name="maxActive" value="10" />
+		<property name="maxIdle" value="10" />
+		<property name="minIdle" value="0" />
+		<property name="maxWait" value="10000" />
+		<property name="initialSize" value="1" />
+		<property name="removeAbandonedTimeout" value="10" />
+		<property name="removeAbandoned" value="true" />
+		<property name="logAbandoned" value="false" />
+		<property name="minEvictableIdleTimeMillis" value="30000" />
+
+	</bean>
+	
+
+	<service interface="javax.sql.DataSource" ref="oracleDataSource" >
+		<service-properties>
+			<entry key="datasource.name" value="oracle" />
+		</service-properties>
+	</service>
+
+</blueprint>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		
+		<propertyPlaceholder id="properties" location="./etc/com.bssys.training.chapter8.cfg" />
+
+		<endpoint id="egg-outqueue" uri="wmqtx:queue:${outQueue}" />
+		<endpoint id="egg-inqueue" uri="wmqtx:queue:${inQueue}" />
+		<endpoint id="egg-errqueue" uri="wmqtx:queue:${errQueue}" />
+		
+		<route>
+			<from uri="timer:foo?period=5000" />
+			<log message="The message" />
+			<setBody>
+				<constant>MESSAGE</constant>
+			</setBody>
+			<to uri="egg-errqueue"/>
+		</route>
+		
+		<route>
+			<from uri="ref:egg-errqueue" />
+			<to uri="file:C:/data/chapter8/out"/>
+		</route>
+		
+		
+	</camelContext>
+
+</beans>

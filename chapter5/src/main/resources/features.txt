@@ -1,0 +1,17 @@
+feature:install spring-jdbc/3.2.11.RELEASE_1
+feature:install jdbc
+feature:install jetty
+feature:install camel-quartz
+feature:install activemq-broker
+feature:install camel-jetty
+feature:install camel-jackson
+feature:install camel-urlrewrite
+feature:install camel-saxon
+install -s mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.postgresql/9.3-1102-jdbc41_1
+install -s wrap:mvn:com.microsoft.sqlserver/sqljdbc4/4.0
+install -s wrap:mvn:com.oracle/ojdbc6/11.2.0.3
+install -s wrap:mvn:org.apache.commons/commons-lang3/3.3.2
+install -s wrap:mvn:commons-io/commons-io/2.4
+install -s wrap:mvn:com.google.guava/guava/18.0
+install -s wrap:mvn:org.apache.httpcomponents/httpcore/4.3.3
+install -s wrap:mvn:org.apache.httpcomponents/httpclient/4.3.6

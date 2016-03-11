@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi" xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:context="http://www.springframework.org/schema/context"
+
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<osgix:cm-properties id="props"
+		persistent-id="com.bssys.training.chapter7" />
+	<context:property-placeholder properties-ref="props"/>
+
+
+	<!-- <osgi:reference id="jmsConnectionPool" interface="javax.jms.ConnectionFactory" />
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="connectionFactory" ref="jmsConnectionPool" />
+		<property name="brokerURL" value="tcp://localhost:61616" />
+		<property name="userName" value="smx" />
+		<property name="password" value="smx" />
+	</bean> -->
+
+	<bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="${brokerURL}" />
+		<property name="userName" value="smx" />
+		<property name="password" value="smx" />
+	</bean>
+	<bean id="jmsConnectionPool" class="org.apache.activemq.pool.PooledConnectionFactory"
+		init-method="start" destroy-method="stop">
+		<property name="maxConnections" value="6" />
+		<property name="connectionFactory" ref="jmsConnectionFactory" />
+	</bean>
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="connectionFactory" ref="jmsConnectionPool" />
+	</bean>
+
+
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+	
+		<propertyPlaceholder id="properties"
+			location="file:./etc/com.bssys.training.chapter7.cfg" />
+	
+	
+		<endpoint id="chapter7" uri="activemq:queue:chapter7?concurrentConsumers=${concurrentConsumers}" />
+		<!-- <route>
+			<from uri="activemq:queue:chapter7?concurrentConsumers=10" />
+			<log message="The message contains ${body} ${properties:concurrentConsumers}" />
+		</route> -->
+		<route>
+			<from uri="ref:chapter7" />
+			<log message="The message contains ${body} ${properties:concurrentConsumers}" />
+		</route>
+	</camelContext>
+
+</beans>

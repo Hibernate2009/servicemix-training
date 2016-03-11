@@ -1,0 +1,10 @@
+<bss:request xmlns:bss="http://bssys.com/training">
+	<bss:item>
+		<pi:FinalPayment Id="ID_1089" xmlns:pi="http://roskazna.ru/gisgmp/xsd/116/PaymentInfo">
+			<pi:SupplierBillID>19823884994949984984</pi:SupplierBillID>
+			<pi:Narrative>Комментарий_356827664</pi:Narrative>
+			<pi:Amount>120</pi:Amount>
+			<pi:PaymentDate>2015-03-29T15:28:54</pi:PaymentDate>
+		</pi:FinalPayment>
+	</bss:item>
+</bss:request>

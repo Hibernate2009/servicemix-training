@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="wmq">
+    <feature name="wmq-features" version="1.0" install='auto'>
+        <bundle start-level="55">file:D:/wmq/com.ibm.mq.osgi.directip_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.mq.osgi.xa_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.commonservices.j2se_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.jms.prereq_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.jms_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.jms_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.nls_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.nls_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.wmq.nls_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.wmq.prereq_7.0.1.7.jar</bundle>
+		<bundle start-level="55">file:C:/wmq/com.ibm.msg.client.osgi.wmq_7.0.1.7.jar </bundle>
+    </feature>
+	       
+</features>

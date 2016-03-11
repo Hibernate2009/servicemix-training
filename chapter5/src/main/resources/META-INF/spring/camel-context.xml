@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<context:component-scan base-package="com.bssys.training.chapter5" />
+
+	<osgi:reference id="dataSource" interface="javax.sql.DataSource"
+		filter="(datasource.name=oracle)" />
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg>
+			<ref bean="dataSource" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="localService" class="com.bssys.training.chapter5.LocalService">
+		<constructor-arg>
+			<ref bean="jdbcTemplate" />
+		</constructor-arg>
+	</bean>
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="timer:foo?period=5000" />
+			<setBody>
+				<method ref="localService" method="get" />
+			</setBody>
+			<choice>
+				<when>
+					<simple>${body.size} > 0 </simple>
+					<split>
+						<simple>${body}</simple>
+						<setProperty propertyName="id">
+							<simple>${body['id']}</simple>
+						</setProperty>
+						<setProperty propertyName="key">
+							<simple>${body['key']}</simple>
+						</setProperty>
+						<setProperty propertyName="value">
+							<simple>${body['value']}</simple>
+						</setProperty>
+						<camel:log message="${property.id} ${property.key} ${property.value}" />
+					</split>
+				</when>
+			</choice>
+		</route>
+	</camelContext>
+
+</beans>

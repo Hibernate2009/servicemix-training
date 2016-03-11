@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<bean id="localService" class="com.bssys.training.chapter2.LocalService" />
+
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+
+		<route>
+			<from uri="file:C:/data/chapter2/in1" />
+			<setProperty propertyName="statementId">
+				<method ref="localService" method="generateId" />
+			</setProperty>
+			<to uri="xslt:transformation/transform.xsl" />
+			<to uri="file:C:/data/chapter2/out" />
+		</route>
+
+		<route>
+			<from uri="file:C:/data/chapter2/in2" />
+			<camel:convertBodyTo type="java.lang.String"/>
+			<setProperty propertyName="statementId">
+				<method ref="localService" method="generateId" />
+			</setProperty>
+			<to uri="velocity:transformation/transform.vs" />
+			<to uri="file:C:/data/chapter2/out" />
+		</route>
+		
+		<route>
+			<from uri="file:C:/data/chapter2/in3" />
+			<setProperty propertyName="statementId">
+				<method ref="localService" method="generateId" />
+			</setProperty>
+			<camel:bean ref="localService" method="transform"/>
+			<to uri="file:C:/data/chapter2/out" />
+		</route>
+
+	</camelContext>
+
+</beans>

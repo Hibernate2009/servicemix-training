@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<cxf:cxfEndpoint id="entryPoint" xmlns:tns="http://tempuri.org/"
+		address="http://127.0.0.1:8383/soapService" endpointName="tns:CalculatorSoap"
+		serviceName="tns:Calculator" wsdlURL="wsdl/calculator.wsdl">
+		<cxf:properties>
+			<entry key="dataFormat" value="MESSAGE" />
+		</cxf:properties>
+	</cxf:cxfEndpoint>
+	
+	<cxf:cxfEndpoint id="entryPoint2" xmlns:tns="http://tempuri.org/"
+		address="http://127.0.0.1:8484/soapService" endpointName="tns:CalculatorSoap"
+		serviceName="tns:Calculator" wsdlURL="wsdl/calculator.wsdl">
+		<cxf:properties>
+			<entry key="dataFormat" value="PAYLOAD" />
+		</cxf:properties>
+	</cxf:cxfEndpoint>
+	
+	<bean id="localService" class="com.bssys.training.chapter4.LocalService"/>
+	<bean id="jaxbLocalService" class="com.bssys.training.chapter4.JAXBLocalService"/>
+	
+	
+	<camelContext xmlns="http://camel.apache.org/schema/spring"  xmlns:tem="http://tempuri.org/">
+	
+		<dataFormats>
+    		<jaxb id="myJaxb" prettyPrint="true" contextPath="com.bssys.training.chapter4.jaxb"/>
+  		</dataFormats>
+		
+		<route>
+			<from uri="cxf:bean:entryPoint" />
+			<convertBodyTo type="java.lang.String"/>
+			<setProperty propertyName="soapAction">
+				<simple>${in.headers.SOAPAction}</simple>
+			</setProperty>
+			<choice>
+				<when>
+					<simple>${property.soapAction} contains 'http://tempuri.org/Add'</simple>
+					<setProperty propertyName="a">
+						<xpath resultType="java.lang.String">//tem:Add/tem:intA</xpath>
+					</setProperty>	
+					<setProperty propertyName="b">
+						<xpath resultType="java.lang.String">//tem:Add/tem:intB</xpath>
+					</setProperty>
+					<setProperty propertyName="result">
+						<method ref="localService" method="add"/>
+					</setProperty>
+					<to uri="xslt:transformation/To_AddResponse.xsl"/>
+				</when>
+				<otherwise>
+					<log message="Operation with SOAPAction:${in.headers.SOAPAction} not implemented"/>
+				</otherwise>
+			</choice>
+		</route>
+		
+		<route>
+			<from uri="cxf:bean:entryPoint2" />
+			<setProperty propertyName="soapAction">
+				<simple>${in.headers.SOAPAction}</simple>
+			</setProperty>
+			<choice>
+				<when>
+					<simple>${property.soapAction} contains 'http://tempuri.org/Add'</simple>
+					<camel:bean ref="jaxbLocalService" method="addOperation"/>
+				</when>
+				<otherwise>
+					<log message="Operation with SOAPAction:${in.headers.SOAPAction} not implemented"/>
+				</otherwise>
+			</choice>
+		</route>
+		
+	</camelContext>
+
+</beans>

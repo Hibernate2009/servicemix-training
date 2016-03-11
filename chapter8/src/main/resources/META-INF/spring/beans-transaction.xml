@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<osgix:cm-properties id="props" persistent-id="com.bssys.training.chapter8" />
+	<context:property-placeholder properties-ref="props" />
+
+	<bean id="wmq" class="org.apache.camel.component.jms.JmsComponent">
+		<property name="connectionFactory">
+			<bean class="com.ibm.mq.jms.MQConnectionFactory">
+				<property name="transportType" value="${transportType}" />
+				<property name="hostName" value="${hostName}" />
+				<property name="port" value="${port}" />
+				<property name="queueManager" value="${queueManager}" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="wmqtx" class="org.apache.camel.component.jms.JmsComponent">
+		<property name="connectionFactory" ref="wmqConnectionFactory" />
+		<property name="transactionManager" ref="jmsTransactionManager" />
+		<property name="transacted" value="true" />
+		<property name="cacheLevel" value="0" />
+	</bean>
+
+	<bean id="jmsTransactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="wmqConnectionFactory" />
+	</bean>
+
+	<bean id="wmqConnectionFactory" class="com.ibm.mq.jms.MQConnectionFactory">
+		<property name="transportType" value="${transportType}" />
+		<property name="hostName" value="${hostName}" />
+		<property name="port" value="${port}" />
+		<property name="queueManager" value="${queueManager}" />
+	</bean>
+	
+
+
+</beans>
